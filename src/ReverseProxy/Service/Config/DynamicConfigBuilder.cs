@@ -3,12 +3,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using Microsoft.ReverseProxy.Abstractions;
 using Microsoft.ReverseProxy.ConfigModel;
+using Microsoft.ReverseProxy.Service.Config;
 using Microsoft.ReverseProxy.Utilities;
 
 namespace Microsoft.ReverseProxy.Service
@@ -19,21 +18,25 @@ namespace Microsoft.ReverseProxy.Service
         private readonly IBackendsRepo _backendsRepo;
         private readonly IRoutesRepo _routesRepo;
         private readonly IRouteValidator _parsedRouteValidator;
+        private readonly ITransformBuilder _transformBuilder;
 
         public DynamicConfigBuilder(
             IEnumerable<IProxyConfigFilter> filters,
             IBackendsRepo backendsRepo,
             IRoutesRepo routesRepo,
-            IRouteValidator parsedRouteValidator)
+            IRouteValidator parsedRouteValidator,
+            ITransformBuilder transformBuilder)
         {
             Contracts.CheckValue(filters, nameof(filters));
             Contracts.CheckValue(backendsRepo, nameof(backendsRepo));
             Contracts.CheckValue(routesRepo, nameof(routesRepo));
             Contracts.CheckValue(parsedRouteValidator, nameof(parsedRouteValidator));
+            Contracts.CheckValue(transformBuilder, nameof(transformBuilder));
             _filters = filters;
             _backendsRepo = backendsRepo;
             _routesRepo = routesRepo;
             _parsedRouteValidator = parsedRouteValidator;
+            _transformBuilder = transformBuilder;
         }
 
         public async Task<Result<DynamicConfigRoot>> BuildConfigAsync(IConfigErrorReporter errorReporter, CancellationToken cancellation)
@@ -124,7 +127,10 @@ namespace Microsoft.ReverseProxy.Service
                     Priority = route.Priority,
                     BackendId = route.BackendId,
                     Metadata = route.Metadata,
+                    Transforms = route.Transforms,
                 };
+
+                // TODO: validate transforms? What about custom ones?
 
                 if (!_parsedRouteValidator.ValidateRoute(parsedRoute, errorReporter))
                 {
