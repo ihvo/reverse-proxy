@@ -54,7 +54,7 @@ namespace Microsoft.ReverseProxy.Middleware.Tests
                 priority: null,
                 backendOrNull: backend1,
                 aspNetCoreEndpoints: aspNetCoreEndpoints.AsReadOnly(),
-                requestParamterTransforms: null);
+                transforms: null);
             var aspNetCoreEndpoint = CreateAspNetCoreEndpoint(routeConfig);
             aspNetCoreEndpoints.Add(aspNetCoreEndpoint);
             var httpContext = new DefaultHttpContext();
@@ -102,7 +102,7 @@ namespace Microsoft.ReverseProxy.Middleware.Tests
                 priority: null,
                 backendOrNull: backend1,
                 aspNetCoreEndpoints: aspNetCoreEndpoints.AsReadOnly(),
-                requestParamterTransforms: null);
+                transforms: null);
             var aspNetCoreEndpoint = CreateAspNetCoreEndpoint(routeConfig);
             aspNetCoreEndpoints.Add(aspNetCoreEndpoint);
             var httpContext = new DefaultHttpContext();
